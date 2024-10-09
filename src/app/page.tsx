@@ -6,7 +6,7 @@ import {useState} from "react";
 const initialRanks = [{name: "Ali", elo: 5000}, {name: "Ruben", elo: 4000}, {name: "Nadya", elo: 4000}, {name: "JC", elo: 2000}, {name: "Tom", elo: 1000}, {name: "Arnaud", elo: 1500}, {name: "Clement", elo: 15}]
 
 export default function Home() {
-    const [ranks, setRanks] = useState(initialRanks)
+    const [ranks] = useState(initialRanks)
 
     const rankings = ranks
         .sort((a, b) => b.elo - a.elo)
