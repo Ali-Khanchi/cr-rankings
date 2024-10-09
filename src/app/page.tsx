@@ -3,7 +3,21 @@
 import Link from "next/link";
 import {useState} from "react";
 
-const initialRanks = [{name: "Ali", elo: 5000}, {name: "Ruben", elo: 4000}, {name: "Nadya", elo: 4000}, {name: "JC", elo: 2000}, {name: "Tom", elo: 1000}, {name: "Arnaud", elo: 1500}, {name: "Clement", elo: 15}]
+const initialRanks = [
+    {name: "Ali", elo: 2780},
+    {name: "Max", elo: 2470},
+    {name: "Tom", elo: 2343},
+    {name: "Ruben", elo: 2200},
+    {name: "Arnaud", elo: 2030},
+    {name: "Clement", elo: 2000},
+    {name: "Harmen", elo: 1700},
+    {name: "Nico", elo: 1600},
+    {name: "Nadya", elo: 1200},
+    {name: "Steph", elo: 1050},
+    {name: "JC", elo: 1000},
+    {name: "Lil bro", elo: 800},
+    {name: "Gabi", elo: 400},
+]
 
 export default function Home() {
     const [ranks] = useState(initialRanks)
@@ -11,12 +25,12 @@ export default function Home() {
     const rankings = ranks
         .sort((a, b) => b.elo - a.elo)
         .map((rank, index) => {
-        return (
-            <div key={index} className={"text-center flex-row"}>
-                <h2 className={"text-2xl"}>{rank.name} - {rank.elo}</h2>
-            </div>
-        )
-    })
+            return (
+                <div key={index} className={"text-center flex-row"}>
+                    <h2 className={"text-2xl"}>{rank.name} - {rank.elo}</h2>
+                </div>
+            )
+        })
 
     return (
         <div>
