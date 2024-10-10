@@ -62,7 +62,11 @@ export async function updatePlayerWithAPI() {
             }
         });
 
-        const data: Battle[] = (await t.json()).reverse();
+        const data: Battle[] = (await t.json())
+
+        if (!data || data.length === 0) {
+            continue;
+        }
 
         for (let j = 0 ; j < players.length ; j++) {
             const commonBattles = data.filter(battle => battle.opponent.length === 1 && battle.opponent[0].tag === `#${players[j].tag}`)
