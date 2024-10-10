@@ -1,10 +1,10 @@
-import {updatePlayer} from "@/app/lib/actions";
+import {updatePlayerWithAPI} from "@/app/lib/actions";
 import {Button} from "@/app/lib/button";
 import {PlayerData} from "@/app/lib/cr-definitions";
 
 export default function Form({players}: { players: PlayerData[] }) {
     return (
-        <form action={updatePlayer}>
+        <form action={updatePlayerWithAPI}>
             <div className="rounded-md bg-gray-50 p-4 md:p-6">
                 {/* Player Name */}
                 <div className="mb-4">
