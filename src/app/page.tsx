@@ -1,43 +1,31 @@
-'use client'
-
 import Link from "next/link";
-import {useState} from "react";
+import {fetchRankings} from "@/app/lib/data";
 
-const initialRanks = [
-    {name: "Ali", elo: 2780},
-    {name: "Max", elo: 2470},
-    {name: "Tom", elo: 2343},
-    {name: "Ruben", elo: 2200},
-    {name: "Arnaud", elo: 2030},
-    {name: "Clement", elo: 2000},
-    {name: "Harmen", elo: 1700},
-    {name: "Nico", elo: 1600},
-    {name: "Nadya", elo: 1200},
-    {name: "Steph", elo: 1050},
-    {name: "JC", elo: 1000},
-    {name: "Lil bro", elo: 800},
-    {name: "Gabi", elo: 400},
-]
+export default async function Home() {
 
-export default function Home() {
-    const [ranks] = useState(initialRanks)
+    const rankData = await fetchRankings();
 
-    const rankings = ranks
+    const rankings = rankData
         .sort((a, b) => b.elo - a.elo)
         .map((rank, index) => {
             return (
-                <div key={index} className={"text-center flex-row"}>
-                    <h2 className={"text-2xl"}>{rank.name} - {rank.elo}</h2>
+                <div key={index} className={"flex font-mono text-xl"}>
+                    <span className={"flex-1"}>{rank.name}</span>
+                    <span className={"text-amber-500"}>{rank.elo}</span>
                 </div>
-            )
-        })
+            );
+        });
 
     return (
         <div>
             <main>
-                <Link href={"/update"} className={""}>Update the Rankings!!</Link>
-                <h1 className={"text-3xl text-center"}>Rankings</h1>
-                {rankings}
+                <Link href={"/update"} className={"text-blue-600 underline"}>Update the Rankings!!</Link>
+                <div className="flex flex-col items-center justify-center">
+                    <h1 className={"text-3xl text-center mb-10"}>🏆 Rankings 🏆</h1>
+                    <div className={"w-56"}>
+                        {rankings}
+                    </div>
+                </div>
             </main>
         </div>
     );
