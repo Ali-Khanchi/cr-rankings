@@ -8,22 +8,19 @@ import {RecordedBattle} from "@/app/lib/cr-definitions";
 
 export default function UpdateRankings() {
     const [isSubmitting, setIsSubmitting] = useState(0);
-    const [results, setResults] = useState<RecordedBattle[] | null>(null);
+    const [results, setResults] = useState<RecordedBattle[]>([]);
 
     const handleSubmit = async (event: { preventDefault: () => void; }) => {
         event.preventDefault();
         setIsSubmitting(1);
         try {
             setResults(await updatePlayerWithAPI());
-            setIsSubmitting(2)
         } catch (error) {
             console.error("Failed to update players", error);
         }
     };
 
-    const noResults = <div>No results.</div>
-
-    let battleLog: JSX.Element[] | undefined = results?.map((battle) => {
+    const battleLog = results.map((battle) => {
         const outcome = battle.winner.id === battle.p1.id
         return (
             <div key={battle.ts + battle.winner.id}>
@@ -50,11 +47,8 @@ export default function UpdateRankings() {
         buttonText = "Update Players"
     } else if (isSubmitting === 1) {
         buttonText = "Updating..."
-    } else if (isSubmitting === 2) {
+    } else {
         buttonText = "Updated!"
-        if (results?.length === 0) {
-            battleLog = Array.of(noResults)
-        }
     }
 
     return (
