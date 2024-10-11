@@ -7,12 +7,12 @@ import {Button} from "@/app/lib/button";
 import {RecordedBattle} from "@/app/lib/cr-definitions";
 
 export default function UpdateRankings() {
-    const [isSubmitting, setIsSubmitting] = useState(0);
+    const [isSubmitting, setIsSubmitting] = useState(false);
     const [results, setResults] = useState<RecordedBattle[]>([]);
 
     const handleSubmit = async (event: { preventDefault: () => void; }) => {
         event.preventDefault();
-        setIsSubmitting(1);
+        setIsSubmitting(true);
         try {
             setResults(await updatePlayerWithAPI());
         } catch (error) {
@@ -43,9 +43,9 @@ export default function UpdateRankings() {
     })
 
     let buttonText
-    if (isSubmitting === 0) {
+    if (!isSubmitting) {
         buttonText = "Update Players"
-    } else if (isSubmitting === 1) {
+    } else if (results.length === 0) {
         buttonText = "Updating..."
     } else {
         buttonText = "Updated!"
@@ -58,7 +58,7 @@ export default function UpdateRankings() {
                 <h1 className={"text-3xl text-center mb-5"}>Update</h1>
                 <form onSubmit={handleSubmit}>
                     <div className="flex rounded-md bg-gray-50 p-4 md:p-6 justify-center">
-                        <Button type="submit" disabled={isSubmitting !== 0}>
+                        <Button type="submit" disabled={isSubmitting}>
                             {buttonText}
                         </Button>
                     </div>
@@ -66,7 +66,7 @@ export default function UpdateRankings() {
                 <div className="flex flex-col items-center justify-center">
                     <h1 className={"text-3xl text-center mb-10"}>Results</h1>
                     <div className={"w-56"}>
-                        {battleLog}
+                        {battleLog.length === 0 ? "No new results." : battleLog}
                     </div>
                 </div>
             </main>
