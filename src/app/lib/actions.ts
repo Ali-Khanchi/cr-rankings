@@ -39,7 +39,7 @@ function eloWinner(elo1: number, elo2: number, outcome: number) {
     const pBlue = probability(elo2, elo1);
     const pRed = 1 - pBlue;
 
-    const K = 30
+    const K = 60
 
     const p1elo = Math.round(elo1 + K * (outcome - pBlue))
     const p2elo = Math.round(elo2 + K * ((1 - outcome) - pRed))
@@ -49,6 +49,7 @@ function eloWinner(elo1: number, elo2: number, outcome: number) {
 export async function updatePlayerWithAPI() {
     const players = await fetchRankings()
     const battleResults: BattleResult[] = await fetchBattleResults()
+    console.log(battleResults[0])
     const dataList: Battle[] = []
 
     const token = process.env.CR_TOKEN;
@@ -75,12 +76,13 @@ export async function updatePlayerWithAPI() {
 
     const recorded: RecordedBattle[] = []
     for (const battle of battleData) {
-        if (battleResults.find(br => br.ts === battle.battleTime && (`#${br.p1tag}` === battle.team[0].tag || `#${br.p1tag}` === battle.opponent[0].tag)) !== undefined) {
-            continue
-        }
         const i = players.findIndex(p => `#${p.tag}` === battle.team[0].tag)
         const j = players.findIndex(p => `#${p.tag}` === battle.opponent[0].tag)
         if (i === -1 || j === -1) {
+            continue
+        }
+
+        if (battleResults.find(br => br.ts == battle.battleTime && (br.player1 == players[i].id || br.player2 == players[i].id)) !== undefined) {
             continue
         }
 
@@ -109,7 +111,7 @@ export async function updatePlayerWithAPI() {
         // console.log(`Updated player ${players[i].name} from ${players[i].elo} to ${p1elo}`);
         // console.log(`Updated player ${players[j].name} from ${players[j].elo} to ${p2elo}`);
 
-        battleResults.push({player1: players[i].id, player2: players[j].id, outcome: winner === 1, ts: battle.battleTime, p1elo: players[i].elo, p2elo: players[j].elo, p1tag: players[i].tag})
+        battleResults.push({player1: players[i].id, player2: players[j].id, outcome: winner === 1, ts: battle.battleTime, p1elo: players[i].elo, p2elo: players[j].elo})
         recorded.push({p1: players[i], p2: players[j], winner: winner === 1 ? players[i] : players[j], p1old: players[i].elo, p2old: players[j].elo, p1new: p1elo, p2new: p2elo, ts: battle.battleTime})
         players[i].elo = p1elo
         players[j].elo = p2elo

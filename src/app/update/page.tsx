@@ -20,25 +20,25 @@ export default function UpdateRankings() {
         }
     };
 
-    const battleLog = results.map((battle, index) => {
+    const battleLog = results.map((battle) => {
         const outcome = battle.winner.id === battle.p1.id
         return (
-            <>
-                <div key={index} className={"flex font-mono text-xl"}>
-                    <span className={`flex-1`}>{new Date(battle.ts).toISOString()}</span>
+            <div key={battle.ts + battle.winner.id}>
+                <div className={"flex font-mono text-xl"}>
+                    <span className={`flex-1`}>{new Date(battle.ts).toDateString()}</span>
                 </div>
-                <div key={index} className={"flex font-mono text-xl"}>
+                <div className={"flex font-mono text-xl"}>
                     <span className={`flex-1 ${outcome ? "text-amber-500" : ""}`}>{battle.p1.name}</span>
                     <span
                         className={`${outcome ? "text-green-500" : "text-red-500"}`}>{battle.p1old} ={">"} {battle.p1new} </span>
                 </div>
-                <div key={index} className={"flex font-mono text-xl"}>
+                <div className={"flex font-mono text-xl"}>
                     <span className={`flex-1 ${!outcome ? "text-amber-500" : ""}`}>{battle.p2.name}</span>
                     <span
                         className={`${!outcome ? "text-green-500" : "text-red-500"}`}>{battle.p2old} ={">"} {battle.p2new} </span>
                 </div>
                 <br/>
-            </>
+            </div>
         )
     })
 

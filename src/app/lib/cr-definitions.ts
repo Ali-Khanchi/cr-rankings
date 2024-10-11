@@ -12,7 +12,6 @@ export type BattleResult = {
     ts: number | string;
     p1elo: number;
     p2elo: number;
-    p1tag: string
 }
 
 export type Battle = {
