@@ -49,7 +49,6 @@ function eloWinner(elo1: number, elo2: number, outcome: number) {
 export async function updatePlayerWithAPI() {
     const players = await fetchRankings()
     const battleResults: BattleResult[] = await fetchBattleResults()
-    console.log(battleResults[0])
     const dataList: Battle[] = []
 
     const token = process.env.CR_TOKEN;
@@ -71,8 +70,6 @@ export async function updatePlayerWithAPI() {
         .filter(b => b.opponent.length === 1 && players.find(p => `#${p.tag}` === b.opponent[0].tag))
         .map(b => {return {team: b.team, opponent: b.opponent, battleTime: parseTimestamp(b.battleTime).getTime()}})
         .sort((a, b) => a.battleTime - b.battleTime)
-
-    // console.log(battleData.length)
 
     const recorded: RecordedBattle[] = []
     for (const battle of battleData) {

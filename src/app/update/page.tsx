@@ -7,20 +7,23 @@ import {Button} from "@/app/lib/button";
 import {RecordedBattle} from "@/app/lib/cr-definitions";
 
 export default function UpdateRankings() {
-    const [isSubmitting, setIsSubmitting] = useState(false);
-    const [results, setResults] = useState<RecordedBattle[]>([]);
+    const [isSubmitting, setIsSubmitting] = useState(0);
+    const [results, setResults] = useState<RecordedBattle[] | null>(null);
 
     const handleSubmit = async (event: { preventDefault: () => void; }) => {
         event.preventDefault();
-        setIsSubmitting(true);
+        setIsSubmitting(1);
         try {
             setResults(await updatePlayerWithAPI());
+            setIsSubmitting(2)
         } catch (error) {
             console.error("Failed to update players", error);
         }
     };
 
-    const battleLog = results.map((battle) => {
+    const noResults = <div>No results.</div>
+
+    let battleLog: JSX.Element[] | undefined = results?.map((battle) => {
         const outcome = battle.winner.id === battle.p1.id
         return (
             <div key={battle.ts + battle.winner.id}>
@@ -43,12 +46,15 @@ export default function UpdateRankings() {
     })
 
     let buttonText
-    if (!isSubmitting) {
+    if (isSubmitting === 0) {
         buttonText = "Update Players"
-    } else if (results.length === 0) {
+    } else if (isSubmitting === 1) {
         buttonText = "Updating..."
-    } else {
+    } else if (isSubmitting === 2) {
         buttonText = "Updated!"
+        if (results?.length === 0) {
+            battleLog = Array.of(noResults)
+        }
     }
 
     return (
@@ -58,7 +64,7 @@ export default function UpdateRankings() {
                 <h1 className={"text-3xl text-center mb-5"}>Update</h1>
                 <form onSubmit={handleSubmit}>
                     <div className="flex rounded-md bg-gray-50 p-4 md:p-6 justify-center">
-                        <Button type="submit" disabled={isSubmitting}>
+                        <Button type="submit" disabled={isSubmitting !== 0}>
                             {buttonText}
                         </Button>
                     </div>
