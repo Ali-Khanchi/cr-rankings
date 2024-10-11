@@ -53,7 +53,7 @@ export async function updatePlayerWithAPI() {
 
     const token = process.env.CR_TOKEN;
     for (let i = 0 ; i < players.length; i++) {
-        const url = `https://api.clashroyale.com/v1/players/%23${players[i].tag}/battlelog`
+        const url = `https://proxy.royaleapi.dev/v1/players/%23${players[i].tag}/battlelog`
         const t = await fetch(url, {
             method: 'GET',
             headers: {
