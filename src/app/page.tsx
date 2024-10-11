@@ -33,7 +33,9 @@ export default async function Home() {
                         </a>
                     </Link>
                 </nav>
+
                 <h1 className="text-4xl font-extrabold mb-10 animate-pulse">🏆 Rankings 🏆</h1>
+
                 <div className="w-64 mx-auto">
                     {rankings}
                 </div>
