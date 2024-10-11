@@ -13,7 +13,7 @@ export async function fetchRankings() {
 
 export async function fetchBattleResults() {
     try {
-        const data = await sql<BattleResult>`SELECT * FROM battles`
+        const data = await sql<BattleResult>`SELECT * FROM battles ORDER BY ts ASC`;
         return data.rows;
     } catch (error) {
         console.error('Database Error:', error);

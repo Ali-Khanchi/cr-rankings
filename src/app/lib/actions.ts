@@ -1,19 +1,18 @@
 'use server';
 
-import {sql} from "@vercel/postgres";
-import {redirect} from "next/navigation";
 import {revalidatePath} from "next/cache";
-import {Battle, BattleResult} from "@/app/lib/cr-definitions";
+import {Battle, BattleResult, RecordedBattle} from "@/app/lib/cr-definitions";
 import {fetchBattleResults, fetchRankings} from "@/app/lib/data";
+import {sql} from "@vercel/postgres";
 
 function probability(elo1: number, elo2: number) {
     return 1 / (1 + 10 ** ((elo1 - elo2) / 400));
 }
 
-function parseTimestamp(timestamp: string | Date) {
+function parseTimestamp(timestamp: string | number): Date {
     // If the input is already a Date object, return it directly
-    if (timestamp instanceof Date) {
-        return timestamp;
+    if (typeof timestamp === "number") {
+        return new Date(timestamp);
     }
 
     // Ensure the timestamp is a string
@@ -42,17 +41,18 @@ function eloWinner(elo1: number, elo2: number, outcome: number) {
 
     const K = 30
 
-    const p1elo = Math.round ( elo1 + K * (outcome - pBlue) )
-    const p2elo = Math.round ( elo2 + K * ((1 - outcome) - pRed) )
+    const p1elo = Math.round(elo1 + K * (outcome - pBlue))
+    const p2elo = Math.round(elo2 + K * ((1 - outcome) - pRed))
     return {p1elo, p2elo}
 }
 
 export async function updatePlayerWithAPI() {
     const players = await fetchRankings()
     const battleResults: BattleResult[] = await fetchBattleResults()
+    const dataList: Battle[] = []
 
     const token = process.env.CR_TOKEN;
-    for (let i = 0 ; i < players.length; i++) {
+    for (let i = 0; i < players.length; i++) {
         const url = `https://proxy.royaleapi.dev/v1/players/%23${players[i].tag}/battlelog`
         const t = await fetch(url, {
             method: 'GET',
@@ -63,49 +63,60 @@ export async function updatePlayerWithAPI() {
         });
 
         const data: Battle[] = (await t.json())
-
-        if (!data || data.length === 0) {
-            continue;
-        }
-
-        for (let j = 0 ; j < players.length ; j++) {
-            const commonBattles = data.filter(battle => battle.opponent.length === 1 && battle.opponent[0].tag === `#${players[j].tag}`)
-            for (const battle of commonBattles) {
-                const ts = parseTimestamp(battle.battleTime)
-
-                const exists = battleResults.some(b => b.ts == ts.getTime() && (b.player1 == players[i].id || b.player2 == players[i].id));
-                if (exists) {
-                    continue;
-                }
-                const winner = battle.team[0].crowns > battle.opponent[0].crowns ? 1 : 0
-                const {p1elo, p2elo} = eloWinner(players[i].elo, players[j].elo, winner)
-
-                await sql`
-                    UPDATE rankings
-                    SET elo = ${p1elo}
-                    WHERE id = ${players[i].id}
-                `;
-
-                await sql`
-                    UPDATE rankings
-                    SET elo = ${p2elo}
-                    WHERE id = ${players[j].id}
-                `;
-
-                await sql`
-                    INSERT INTO battles (player1, player2, outcome, ts, p1elo, p2elo)
-                    VALUES (${players[i].id}, ${players[j].id}, ${winner === 1}, ${ts.getTime()}, ${players[i].elo}, ${players[j].elo})
-                `;
-
-                console.log(`Updated player ${players[i].name} from ${players[i].elo} to ${p1elo}`);
-                console.log(`Updated player ${players[j].name} from ${players[j].elo} to ${p2elo}`);
-
-                players[i].elo = p1elo
-                players[j].elo = p2elo
-            }
-        }
-
+        dataList.push(...data)
     }
+
+    const battleData: Battle[] = dataList
+        .filter(b => b.opponent.length === 1 && players.find(p => `#${p.tag}` === b.opponent[0].tag))
+        .map(b => {return {team: b.team, opponent: b.opponent, battleTime: parseTimestamp(b.battleTime).getTime()}})
+        .sort((a, b) => a.battleTime - b.battleTime)
+
+    // console.log(battleData.length)
+
+    const recorded: RecordedBattle[] = []
+    for (const battle of battleData) {
+        if (battleResults.find(br => br.ts === battle.battleTime && (`#${br.p1tag}` === battle.team[0].tag || `#${br.p1tag}` === battle.opponent[0].tag)) !== undefined) {
+            continue
+        }
+        const i = players.findIndex(p => `#${p.tag}` === battle.team[0].tag)
+        const j = players.findIndex(p => `#${p.tag}` === battle.opponent[0].tag)
+        if (i === -1 || j === -1) {
+            continue
+        }
+
+
+        const winner = battle.team[0].crowns > battle.opponent[0].crowns ? 1 : 0
+                    const {p1elo, p2elo} = eloWinner(players[i].elo, players[j].elo, winner)
+
+        await sql`
+            UPDATE rankings
+            SET elo = ${p1elo}
+            WHERE id = ${players[i].id}
+        `;
+
+        await sql`
+            UPDATE rankings
+            SET elo = ${p2elo}
+            WHERE id = ${players[j].id}
+        `;
+
+        await sql`
+            INSERT INTO battles (player1, player2, outcome, ts, p1elo, p2elo)
+            VALUES (${players[i].id}, ${players[j].id}, ${winner === 1}, ${battle.battleTime}, ${players[i].elo},
+                    ${players[j].elo})
+        `;
+
+        // console.log(`Updated player ${players[i].name} from ${players[i].elo} to ${p1elo}`);
+        // console.log(`Updated player ${players[j].name} from ${players[j].elo} to ${p2elo}`);
+
+        battleResults.push({player1: players[i].id, player2: players[j].id, outcome: winner === 1, ts: battle.battleTime, p1elo: players[i].elo, p2elo: players[j].elo, p1tag: players[i].tag})
+        recorded.push({p1: players[i], p2: players[j], winner: winner === 1 ? players[i] : players[j], p1old: players[i].elo, p2old: players[j].elo, p1new: p1elo, p2new: p2elo, ts: battle.battleTime})
+        players[i].elo = p1elo
+        players[j].elo = p2elo
+    }
+
+    console.log(`${Date()} :: Recorded ${recorded.length} new battles.`)
     revalidatePath('/');
-    redirect('/');
+
+    return recorded.reverse()
 }
