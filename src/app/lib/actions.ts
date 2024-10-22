@@ -39,7 +39,7 @@ function eloWinner(elo1: number, elo2: number, outcome: number) {
     const pBlue = probability(elo2, elo1);
     const pRed = 1 - pBlue;
 
-    const K = 20
+    const K = 45
 
     const p1elo = Math.round(elo1 + K * (outcome - pBlue))
     const p2elo = Math.round(elo2 + K * ((1 - outcome) - pRed))
