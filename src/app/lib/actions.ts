@@ -4,10 +4,7 @@ import {revalidatePath} from "next/cache";
 import {Battle, BattleResult, RecordedBattle} from "@/app/lib/cr-definitions";
 import {fetchBattleResults, fetchRankings} from "@/app/lib/data";
 import {sql} from "@vercel/postgres";
-
-function probability(elo1: number, elo2: number) {
-    return 1 / (1 + 10 ** ((elo1 - elo2) / 400));
-}
+import {eloWinner} from "@/app/lib/elo-calc";
 
 function parseTimestamp(timestamp: string | number): Date {
     // If the input is already a Date object, return it directly
@@ -33,17 +30,6 @@ function parseTimestamp(timestamp: string | number): Date {
 
     // Convert to a Date object
     return new Date(timestamp);
-}
-
-function eloWinner(elo1: number, elo2: number, outcome: number) {
-    const pBlue = probability(elo2, elo1);
-    const pRed = 1 - pBlue;
-
-    const K = 60
-
-    const p1elo = Math.round(elo1 + K * (outcome - pBlue))
-    const p2elo = Math.round(elo2 + K * ((1 - outcome) - pRed))
-    return {p1elo, p2elo}
 }
 
 export async function updatePlayerWithAPI() {
