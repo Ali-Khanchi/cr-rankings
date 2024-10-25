@@ -58,10 +58,8 @@ export default function UpdateRankings() {
             <main className="w-full max-w-lg mx-auto text-center">
                 {/* Navigation link */}
                 <nav className="mb-8">
-                    <Link href="/">
-                        <a className="text-blue-500 hover:text-blue-400 underline transform transition duration-300 hover:scale-110">
+                    <Link href="/" className="text-blue-500 hover:text-blue-400 underline transform transition duration-300 hover:scale-110">
                             See the Rankings!!
-                        </a>
                     </Link>
                 </nav>
 

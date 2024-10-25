@@ -69,9 +69,8 @@ export async function updatePlayerWithAPI() {
             continue
         }
 
-
         const winner = battle.team[0].crowns > battle.opponent[0].crowns ? 1 : 0
-                    const {p1elo, p2elo} = eloWinner(players[i].elo, players[j].elo, winner)
+        const {p1elo, p2elo} = eloWinner(players[i].elo, players[j].elo, winner)
 
         await sql`
             UPDATE rankings

@@ -5,11 +5,11 @@ import {eloWinner} from "@/app/lib/elo-calc";
 
 export default async function BattleLogs() {
 
-    const results = await fetchBattleResults();
+    const results = (await fetchBattleResults()).reverse();
     const players = await fetchRankings();
-    const playerMap = new Map<string, PlayerData>();
+    const playerMap = new Map<number, PlayerData>();
     players.map(p => {
-        playerMap.set(p.id, p)
+        playerMap.set(parseInt(p.id,10), p)
     })
 
     const battleLog = results.map((battle) => {
@@ -18,15 +18,15 @@ export default async function BattleLogs() {
         return (
             <div key={battle.ts + battle.player1}>
                 <div className={"flex font-mono text-xl"}>
-                    <span className={`flex-1`}>{new Date(battle.ts).toDateString()}</span>
+                    <span className={`flex-1`}>{new Date(Number(battle.ts)).toDateString()}</span>
                 </div>
                 <div className={"flex font-mono text-xl"}>
-                    <span className={`flex-1 ${outcome ? "text-amber-500" : ""}`}>{playerMap.get(battle.player1)?.name}</span>
+                    <span className={`flex-1 ${outcome ? "text-amber-500" : ""}`}>{playerMap.get(parseInt(battle.player1,10))?.name}</span>
                     <span
                         className={`${outcome ? "text-green-500" : "text-red-500"}`}>{battle.p1elo} ={">"} {p1new} </span>
                 </div>
                 <div className={"flex font-mono text-xl"}>
-                    <span className={`flex-1 ${!outcome ? "text-amber-500" : ""}`}>{playerMap.get(battle.player2)?.name}</span>
+                    <span className={`flex-1 ${!outcome ? "text-amber-500" : ""}`}>{playerMap.get(parseInt(battle.player2,10))?.name}</span>
                     <span
                         className={`${!outcome ? "text-green-500" : "text-red-500"}`}>{battle.p2elo} ={">"} {p2new} </span>
                 </div>
@@ -36,13 +36,27 @@ export default async function BattleLogs() {
     })
 
     return (
-        <div>
-            <main>
-                <Link href={"/"} className={"text-blue-600 underline m-5"}>See the Rankings!!</Link>
-                <div className="flex flex-col items-center justify-center">
-                    <h1 className={"text-3xl text-center mb-10"}>Results</h1>
-                    <div className={"w-56"}>
-                        {battleLog.length === 0 ? "No new results." : battleLog}
+        <div className="min-h-screen bg-gradient-to-b from-gray-900 to-gray-700 text-white flex flex-col items-center justify-center p-6">
+            <main className="w-full max-w-lg mx-auto text-center">
+                {/* Navigation link */}
+                <nav className="mb-8">
+                    <Link href="/" className="text-blue-500 hover:text-blue-400 underline transform transition duration-300 hover:scale-110">
+                        See the Rankings!!
+                    </Link>
+                </nav>
+
+                {/* Title */}
+                <h1 className="text-4xl font-extrabold mb-5 animate-pulse">Battle Log</h1>
+
+                {/* Results */}
+                <div className="w-full">
+                    <h2 className="text-3xl font-semibold mb-5">Results</h2>
+                    <div className="w-full">
+                        {battleLog.length === 0 ? (
+                            <p className="text-gray-400">No new results.</p>
+                        ) : (
+                            <div className="space-y-4">{battleLog}</div>
+                        )}
                     </div>
                 </div>
             </main>

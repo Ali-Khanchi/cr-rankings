@@ -22,15 +22,11 @@ export default async function Home() {
         <div className="min-h-screen bg-gradient-to-b from-gray-900 to-gray-700 text-white flex flex-col items-center justify-center p-6">
             <main className="w-full max-w-md mx-auto text-center">
                 <nav className="flex justify-center space-x-4 mb-8">
-                    <Link href="/update">
-                        <a className="text-blue-500 hover:text-blue-400 underline transform transition duration-300 hover:scale-110">
+                    <Link href="/update" className="text-blue-500 hover:text-blue-400 underline transform transition duration-300 hover:scale-110">
                             Update Rankings
-                        </a>
                     </Link>
-                    <Link href="/logs">
-                        <a className="text-blue-500 hover:text-blue-400 underline transform transition duration-300 hover:scale-110">
+                    <Link href="/logs" className="text-blue-500 hover:text-blue-400 underline transform transition duration-300 hover:scale-110">
                             Battle Log
-                        </a>
                     </Link>
                 </nav>
 
