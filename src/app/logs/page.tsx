@@ -9,7 +9,8 @@ const tsOptions: Intl.DateTimeFormatOptions = {
   day: 'numeric',
   hour: '2-digit',
   minute: '2-digit',
-  hour12: false        // Set to true for 12-hour format
+  hour12: false,                  // Set to true for 12-hour format
+  timeZone: 'Europe/Amsterdam'   // Set to Amsterdam time zone
 };
 
 export default async function BattleLogs() {
