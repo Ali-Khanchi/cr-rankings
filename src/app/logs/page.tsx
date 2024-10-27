@@ -3,15 +3,15 @@ import {fetchBattleResults, fetchRankings} from "@/app/lib/data";
 import {PlayerData} from "@/app/lib/cr-definitions";
 import {eloWinner} from "@/app/lib/elo-calc";
 
-const tsOptions = {
-  weekday: 'short',    // Full weekday name, e.g., "Monday"
+const tsOptions: Intl.DateTimeFormatOptions = {
+  weekday: 'short',    // Short weekday name, e.g., "Mon"
   year: 'numeric',
   month: 'short',
   day: 'numeric',
   hour: '2-digit',
   minute: '2-digit',
   second: '2-digit',
-  hour12: false       // Set to true for 12-hour format
+  hour12: false        // Set to true for 12-hour format
 };
 
 export default async function BattleLogs() {
