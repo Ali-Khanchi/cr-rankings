@@ -3,6 +3,17 @@ import {fetchBattleResults, fetchRankings} from "@/app/lib/data";
 import {PlayerData} from "@/app/lib/cr-definitions";
 import {eloWinner} from "@/app/lib/elo-calc";
 
+const tsOptions = {
+  weekday: 'short',    // Full weekday name, e.g., "Monday"
+  year: 'numeric',
+  month: 'short',
+  day: 'numeric',
+  hour: '2-digit',
+  minute: '2-digit',
+  second: '2-digit',
+  hour12: false       // Set to true for 12-hour format
+};
+
 export default async function BattleLogs() {
 
     const results = (await fetchBattleResults()).reverse();
@@ -18,7 +29,7 @@ export default async function BattleLogs() {
         return (
             <div key={battle.ts + battle.player1}>
                 <div className={"flex font-mono text-xl"}>
-                    <span className={`flex-1`}>{new Date(Number(battle.ts)).toDateString()}</span>
+                    <span className={`flex-1`}>{new Date(Number(battle.ts)).toLocaleString('en-US', tsOptions)}</span>
                 </div>
                 <div className={"flex font-mono text-xl"}>
                     <span className={`flex-1 ${outcome ? "text-amber-500" : ""}`}>{playerMap.get(parseInt(battle.player1,10))?.name}</span>
