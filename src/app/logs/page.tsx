@@ -5,12 +5,10 @@ import {eloWinner} from "@/app/lib/elo-calc";
 
 const tsOptions: Intl.DateTimeFormatOptions = {
   weekday: 'short',    // Short weekday name, e.g., "Mon"
-  year: 'numeric',
   month: 'short',
   day: 'numeric',
   hour: '2-digit',
   minute: '2-digit',
-  second: '2-digit',
   hour12: false        // Set to true for 12-hour format
 };
 
