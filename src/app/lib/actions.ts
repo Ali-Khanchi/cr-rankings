@@ -101,6 +101,7 @@ export async function updatePlayerWithAPI() {
 
     console.log(`${Date()} :: Recorded ${recorded.length} new battles.`)
     revalidatePath('/');
+    revalidatePath('/logs');
 
     return recorded.reverse()
 }
